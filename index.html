@@ -608,17 +608,48 @@ const BASE_URL = "https://script.google.com/macros/s/AKfycbyI7GmpUp-0_RhY9BTTXCJ
 function playBeep() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.1);
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.35);
+
+    // Clic mécanique initial
+    const bufSize = ctx.sampleRate * 0.01;
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
+    const click = ctx.createBufferSource();
+    click.buffer = buf;
+    const clickGain = ctx.createGain();
+    clickGain.gain.setValueAtTime(0.15, ctx.currentTime);
+    click.connect(clickGain);
+    clickGain.connect(ctx.destination);
+    click.start(ctx.currentTime);
+
+    // Bip laser principal
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'square';
+    osc1.frequency.setValueAtTime(2400, ctx.currentTime + 0.005);
+    osc1.frequency.exponentialRampToValueAtTime(1800, ctx.currentTime + 0.045);
+    osc1.frequency.exponentialRampToValueAtTime(2100, ctx.currentTime + 0.09);
+    gain1.gain.setValueAtTime(0, ctx.currentTime);
+    gain1.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.008);
+    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(ctx.currentTime + 0.005);
+    osc1.stop(ctx.currentTime + 0.13);
+
+    // Harmonique haute (craquant de laser)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sawtooth';
+    osc2.frequency.setValueAtTime(4800, ctx.currentTime + 0.005);
+    osc2.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 0.07);
+    gain2.gain.setValueAtTime(0.06, ctx.currentTime + 0.005);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.005);
+    osc2.stop(ctx.currentTime + 0.09);
+
   } catch(e) {}
 }
 
@@ -775,6 +806,9 @@ function processManual() {
   processCardId(id);
 }
 
+document.getElementById('manual-input').addEventListener('input', (e) => {
+  if (scannerRunning) { e.target.value = ''; return; }
+});
 document.getElementById('manual-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') processManual();
 });
