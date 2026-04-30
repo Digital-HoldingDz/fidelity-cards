@@ -559,19 +559,6 @@
       <input id="usb-input" type="text" placeholder="Le scanner USB écrit ici automatiquement" autocomplete="off" spellcheck="false">
     </div>
 
-    <!-- QR Result Bar -->
-    <div class="manual-zone" style="margin-bottom:1.5rem">
-      <div class="section-title">Résultat QR scanné</div>
-      <div class="manual-row">
-        <input id="qr-result-input" type="text" placeholder="L'URL du QR apparaîtra ici…" autocomplete="off" spellcheck="false" readonly
-          style="flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.18);border-radius:10px;color:var(--gold-light);font-family:'Montserrat',sans-serif;font-size:0.78rem;letter-spacing:0.05em;padding:0.75rem 1rem;outline:none;caret-color:var(--gold);">
-        <button id="btn-open-qr" onclick="openQrResult()" disabled
-          style="padding:0.75rem 1rem;border:none;border-radius:10px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-mid) 100%);color:var(--black);font-family:'Montserrat',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;opacity:0.4;white-space:nowrap;">
-          Ouvrir
-        </button>
-      </div>
-    </div>
-
     <!-- Manual Input -->
     <div class="manual-zone">
       <div class="section-title">Saisie manuelle</div>
@@ -621,48 +608,17 @@ const BASE_URL = "https://script.google.com/macros/s/AKfycbyI7GmpUp-0_RhY9BTTXCJ
 function playBeep() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-
-    // Clic mécanique initial
-    const bufSize = ctx.sampleRate * 0.01;
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
-    const click = ctx.createBufferSource();
-    click.buffer = buf;
-    const clickGain = ctx.createGain();
-    clickGain.gain.setValueAtTime(0.15, ctx.currentTime);
-    click.connect(clickGain);
-    clickGain.connect(ctx.destination);
-    click.start(ctx.currentTime);
-
-    // Bip laser principal
-    const osc1 = ctx.createOscillator();
-    const gain1 = ctx.createGain();
-    osc1.type = 'square';
-    osc1.frequency.setValueAtTime(2400, ctx.currentTime + 0.005);
-    osc1.frequency.exponentialRampToValueAtTime(1800, ctx.currentTime + 0.045);
-    osc1.frequency.exponentialRampToValueAtTime(2100, ctx.currentTime + 0.09);
-    gain1.gain.setValueAtTime(0, ctx.currentTime);
-    gain1.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.008);
-    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-    osc1.connect(gain1);
-    gain1.connect(ctx.destination);
-    osc1.start(ctx.currentTime + 0.005);
-    osc1.stop(ctx.currentTime + 0.13);
-
-    // Harmonique haute (craquant de laser)
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc2.type = 'sawtooth';
-    osc2.frequency.setValueAtTime(4800, ctx.currentTime + 0.005);
-    osc2.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 0.07);
-    gain2.gain.setValueAtTime(0.06, ctx.currentTime + 0.005);
-    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-    osc2.connect(gain2);
-    gain2.connect(ctx.destination);
-    osc2.start(ctx.currentTime + 0.005);
-    osc2.stop(ctx.currentTime + 0.09);
-
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.35);
   } catch(e) {}
 }
 
@@ -679,51 +635,20 @@ function showFlash(msg, isSuccess = true) {
 
 // ─── PROCESS CARD ID ──────────────────────────────────────
 let lastRedirect = 0;
-function processCardId(rawId, isQr = false) {
+function processCardId(rawId) {
   const now = Date.now();
-  if (now - lastRedirect < 2000) return;
+  if (now - lastRedirect < 2000) return; // debounce
   lastRedirect = now;
 
   const id = rawId.trim().toUpperCase();
   if (!id) return;
 
-  // Si c'est un scan QR → afficher dans la barre dédiée et ouvrir
-  if (isQr) {
-    const raw = rawId.trim(); // garder l'URL originale non modifiée
-    const resultInput = document.getElementById('qr-result-input');
-    const openBtn = document.getElementById('btn-open-qr');
-    resultInput.value = raw;
-    openBtn.disabled = false;
-    openBtn.style.opacity = '1';
-    window._lastQrUrl = raw; // stocker pour le bouton Ouvrir
-
-    const zone = document.getElementById('last-scan-zone');
-    document.getElementById('last-scan-id').textContent = id;
-    zone.classList.add('visible');
-
-   playBeep();
-
-// Afficher un bouton d'ouverture immédiat — contourne les blocages mobile
-const resultInput = document.getElementById('qr-result-input');
-const openBtn = document.getElementById('btn-open-qr');
-resultInput.value = rawUrl.trim();
-openBtn.disabled = false;
-openBtn.style.opacity = '1';
-window._lastQrUrl = rawUrl.trim();
-
-showFlash('QR lu — appuyez sur Ouvrir');
-
-// Sur mobile : ne pas rediriger automatiquement, laisser l'utilisateur taper
-// Sur PC : redirection auto
-if (window.innerWidth > 768) {
-  setTimeout(() => { window.location.href = rawUrl.trim(); }, 1000);
-}
-
-  // Saisie manuelle ou USB → construire l'URL vendeur
+  // Show last scanned
   const zone = document.getElementById('last-scan-zone');
   document.getElementById('last-scan-id').textContent = id;
   zone.classList.add('visible');
 
+  // Card glow
   const card = document.getElementById('main-card');
   card.classList.add('success-flash');
   setTimeout(() => card.classList.remove('success-flash'), 700);
@@ -731,6 +656,7 @@ if (window.innerWidth > 768) {
   playBeep();
   showFlash(`Carte ${id} reconnue — redirection…`);
 
+  // Redirect after short delay
   setTimeout(() => {
     const url = `${BASE_URL}?carte=${encodeURIComponent(id)}&mode=vendeur`;
     window.location.href = url;
@@ -761,9 +687,13 @@ function startScanner() {
     { fps: 12, qrbox: { width: 220, height: 220 }, aspectRatio: 1 },
     (decodedText) => {
       // Extract carte param if it's a full URL, else use raw
-      const rawUrl = decodedText; // on garde l'URL brute intacte
+      let cartId = decodedText;
+      try {
+        const u = new URL(decodedText);
+        cartId = u.searchParams.get('carte') || decodedText;
+      } catch(e) {}
       stopScanner();
-      processCardId(rawUrl, true);
+      processCardId(cartId);
     },
     () => {} // error: silent
   ).catch(err => {
@@ -794,9 +724,6 @@ function stopScanner() {
 const usbInput = document.getElementById('usb-input');
 
 // Keep USB input focused on desktop
-  function openQrResult() {
-  if (window._lastQrUrl) window.location.href = window._lastQrUrl;
-}
 function focusUsb() {
   if (window.innerWidth > 768) usbInput.focus();
 }
@@ -848,9 +775,6 @@ function processManual() {
   processCardId(id);
 }
 
-document.getElementById('manual-input').addEventListener('input', (e) => {
-  if (scannerRunning) { e.target.value = ''; return; }
-});
 document.getElementById('manual-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') processManual();
 });
