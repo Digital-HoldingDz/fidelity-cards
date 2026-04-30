@@ -701,11 +701,23 @@ function processCardId(rawId, isQr = false) {
     document.getElementById('last-scan-id').textContent = id;
     zone.classList.add('visible');
 
-    playBeep();
-    showFlash(`QR lu — redirection…`);
-    setTimeout(() => { window.location.href = raw; }, 1000);
-    return;
-  }
+   playBeep();
+
+// Afficher un bouton d'ouverture immédiat — contourne les blocages mobile
+const resultInput = document.getElementById('qr-result-input');
+const openBtn = document.getElementById('btn-open-qr');
+resultInput.value = rawUrl.trim();
+openBtn.disabled = false;
+openBtn.style.opacity = '1';
+window._lastQrUrl = rawUrl.trim();
+
+showFlash('QR lu — appuyez sur Ouvrir');
+
+// Sur mobile : ne pas rediriger automatiquement, laisser l'utilisateur taper
+// Sur PC : redirection auto
+if (window.innerWidth > 768) {
+  setTimeout(() => { window.location.href = rawUrl.trim(); }, 1000);
+}
 
   // Saisie manuelle ou USB → construire l'URL vendeur
   const zone = document.getElementById('last-scan-zone');
