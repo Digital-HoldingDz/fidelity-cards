@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0;url=PLACEHOLDER">
+<script>
+  const p = new URLSearchParams(window.location.search);
+  const carte = p.get('carte');
+  const base = "https://script.google.com/macros/s/AKfycbyI7GmpUp-0_RhY9BTTXCJ6ijrH8-XZ5tK48X6pIS_xaSBAgU3PbcwkEZlHO-D5QSiY/exec";
+  window.location.replace(base + "?carte=" + encodeURIComponent(carte) + "&mode=vendeur");
+</script>
+</head>
+<body></body>
+</html>
