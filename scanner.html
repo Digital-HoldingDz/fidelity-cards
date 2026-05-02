@@ -659,7 +659,7 @@ function processCardId(rawId) {
   // Redirect after short delay
   setTimeout(() => {
     const url = 'redirect.html?carte=' + encodeURIComponent(id);
-window.location.href = url;
+window.open(url, '_blank');
   }, 1000);
 }
 
