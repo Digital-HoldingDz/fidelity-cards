@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Holding Dz — Scanner Vendeur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #FEFECB;
+    --gold-mid: #FEC715;
+    --black: #0a0a0a;
+    --black-soft: #111111;
+    --black-card: #161616;
+    --black-border: #1e1e1e;
+    --text-dim: #888;
+    --text-muted: #555;
+    --success: #4CAF50;
+    --error: #e53935;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: #e8e0cc;
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ─── BACKGROUND ATMOSPHERE ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(254,199,21,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 20% at 10% 60%, rgba(201,168,76,0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── PARTICLES ─── */
+  #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0;
+    animation: float-up linear infinite;
+  }
+  @keyframes float-up {
+    0%   { transform: translateY(0) scale(1); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.2; }
+    100% { transform: translateY(-100vh) scale(0.3); opacity: 0; }
+  }
+
+  /* ─── LAYOUT ─── */
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1.25rem 3rem;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  .logo-ring {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+    box-shadow: 0 0 30px rgba(201,168,76,0.4), 0 0 60px rgba(201,168,76,0.15);
+    animation: logo-pulse 3s ease-in-out infinite;
+  }
+  @keyframes logo-pulse {
+    0%, 100% { box-shadow: 0 0 30px rgba(201,168,76,0.4), 0 0 60px rgba(201,168,76,0.15); }
+    50%       { box-shadow: 0 0 45px rgba(201,168,76,0.6), 0 0 90px rgba(201,168,76,0.25); }
+  }
+  .logo-ring img {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold-mid) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+  }
+
+  .brand-sub {
+    font-size: 0.68rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    opacity: 0.75;
+    font-weight: 500;
+  }
+
+  /* ─── DIVIDER ─── */
+  .gold-divider {
+    width: 120px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto 2rem;
+    opacity: 0.6;
+  }
+
+  /* ─── MAIN CARD ─── */
+  .scanner-card {
+    width: 100%;
+    max-width: 500px;
+    background: var(--black-card);
+    border: 1px solid var(--black-border);
+    border-radius: 20px;
+    padding: 2rem 1.75rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(201,168,76,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .scanner-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold-light) 50%, var(--gold) 70%, transparent 100%);
+    opacity: 0.5;
+  }
+
+  /* ─── SCAN BUTTON ─── */
+  .scan-btn-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.75rem;
+  }
+
+  #btn-scan {
+    position: relative;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #1a1500 0%, #2a2000 50%, #1a1500 100%);
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 0 0 1px rgba(201,168,76,0.3);
+  }
+  #btn-scan::before, #btn-scan::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgba(201,168,76,0.35);
+    animation: ring-expand 2.5s ease-out infinite;
+  }
+  #btn-scan::before { inset: -12px; animation-delay: 0s; }
+  #btn-scan::after  { inset: -24px; animation-delay: 0.8s; border-color: rgba(201,168,76,0.18); }
+
+  #btn-scan .extra-ring {
+    position: absolute;
+    inset: -36px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.08);
+    animation: ring-expand 2.5s ease-out infinite;
+    animation-delay: 1.6s;
+  }
+
+  @keyframes ring-expand {
+    0%   { transform: scale(0.85); opacity: 0.8; }
+    100% { transform: scale(1.15); opacity: 0; }
+  }
+
+  #btn-scan.active-pulse::before { border-color: rgba(201,168,76,0.7); animation-duration: 1.2s; }
+  #btn-scan.active-pulse::after  { border-color: rgba(201,168,76,0.4); animation-duration: 1.2s; }
+  #btn-scan:active { transform: scale(0.96); }
+
+  .scan-icon {
+    width: 52px; height: 52px;
+    fill: none;
+    stroke: url(#goldGrad);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 8px rgba(201,168,76,0.6));
+  }
+  .scan-btn-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+  }
+
+  /* ─── QR READER CONTAINER ─── */
+  #qr-reader-container {
+    display: none;
+    margin-bottom: 1.5rem;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(201,168,76,0.25);
+    position: relative;
+  }
+  #qr-reader-container.visible { display: block; }
+
+  #qr-reader {
+    width: 100% !important;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  /* Override html5-qrcode default ugly styles */
+  #qr-reader video { border-radius: 12px; }
+  #qr-reader > div:first-child { display: none !important; }
+  #qr-reader__scan_region { background: transparent !important; }
+  #qr-reader__dashboard { display: none !important; }
+
+  .qr-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qr-corner {
+    position: absolute;
+    width: 40px; height: 40px;
+    border-color: var(--gold);
+    border-style: solid;
+    opacity: 0.8;
+  }
+  .qr-corner.tl { top: 15px; left: 15px; border-width: 3px 0 0 3px; border-radius: 6px 0 0 0; }
+  .qr-corner.tr { top: 15px; right: 15px; border-width: 3px 3px 0 0; border-radius: 0 6px 0 0; }
+  .qr-corner.bl { bottom: 15px; left: 15px; border-width: 0 0 3px 3px; border-radius: 0 0 0 6px; }
+  .qr-corner.br { bottom: 15px; right: 15px; border-width: 0 3px 3px 0; border-radius: 0 0 6px 0; }
+
+  .scan-line {
+    position: absolute;
+    width: calc(100% - 40px);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold-mid), transparent);
+    box-shadow: 0 0 10px var(--gold);
+    animation: scan 2s linear infinite;
+    opacity: 0.8;
+  }
+  @keyframes scan {
+    0%   { top: 20px; }
+    50%  { top: calc(100% - 20px); }
+    100% { top: 20px; }
+  }
+
+  #btn-stop {
+    display: none;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.7rem;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 10px;
+    color: var(--text-dim);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  #btn-stop.visible { display: block; }
+  #btn-stop:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ─── SECTION TITLE ─── */
+  .section-title {
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.65;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  /* ─── USB INPUT (PC) ─── */
+  .usb-zone {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: rgba(201,168,76,0.04);
+    border: 1px solid rgba(201,168,76,0.12);
+    border-radius: 12px;
+  }
+  .usb-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+  .usb-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold);
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .usb-label { font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.08em; }
+
+  #usb-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    color: var(--gold-light);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 0;
+    outline: none;
+    transition: border-color 0.2s;
+    caret-color: var(--gold);
+  }
+  #usb-input:focus { border-bottom-color: var(--gold); }
+  #usb-input::placeholder { color: var(--text-muted); font-size: 0.8rem; }
+
+  /* ─── MANUAL INPUT ─── */
+  .manual-zone { margin-bottom: 1.5rem; }
+
+  .manual-row {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  #manual-input {
+    flex: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 10px;
+    color: var(--gold-light);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    caret-color: var(--gold);
+  }
+  #manual-input:focus { border-color: rgba(201,168,76,0.5); }
+  #manual-input::placeholder { color: var(--text-muted); }
+
+  #btn-manual {
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-mid) 100%);
+    color: var(--black);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    white-space: nowrap;
+  }
+  #btn-manual:hover { opacity: 0.88; }
+  #btn-manual:active { transform: scale(0.97); }
+
+  /* ─── LAST SCANNED ─── */
+  #last-scan-zone {
+    display: none;
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 12px;
+    background: rgba(201,168,76,0.04);
+    animation: slide-up 0.4s ease;
+  }
+  @keyframes slide-up {
+    from { transform: translateY(10px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+  #last-scan-zone.visible { display: block; }
+
+  .last-label { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.4rem; }
+  #last-scan-id {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+  }
+
+  /* ─── STATUS FLASH ─── */
+  #status-flash {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: var(--black-card);
+    border: 1px solid var(--gold);
+    border-radius: 16px;
+    padding: 1.5rem 2.5rem;
+    text-align: center;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    box-shadow: 0 0 60px rgba(201,168,76,0.3);
+  }
+  #status-flash.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  #status-flash .flash-icon { font-size: 2rem; margin-bottom: 0.4rem; }
+  #status-flash .flash-msg { font-size: 0.85rem; color: var(--gold-light); letter-spacing: 0.08em; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    margin-top: 2.5rem;
+    text-align: center;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  footer span {
+    background: linear-gradient(90deg, var(--gold), var(--gold-mid));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ─── SUCCESS GLOW ─── */
+  @keyframes success-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(76,175,80,0); }
+    50% { box-shadow: 0 0 40px rgba(76,175,80,0.5); }
+  }
+  .scanner-card.success-flash { animation: success-glow 0.6s ease; }
+
+  /* ─── MOBILE TWEAKS ─── */
+  @media (max-width: 480px) {
+    #btn-scan { width: 140px; height: 140px; }
+    .scan-icon { width: 44px; height: 44px; }
+    .scanner-card { padding: 1.5rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SVG defs for gradient stroke -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C9A84C"/>
+      <stop offset="50%" style="stop-color:#FEFECB"/>
+      <stop offset="100%" style="stop-color:#FEC715"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- Particles -->
+<div id="particles"></div>
+
+<!-- Status Flash -->
+<div id="status-flash">
+  <div class="flash-icon" id="flash-icon">✓</div>
+  <div class="flash-msg" id="flash-msg">Carte reconnue</div>
+</div>
+
+<div class="page-wrapper">
+  <!-- Header -->
+  <header>
+    <div class="logo-ring">
+      <img src="https://i.ibb.co/KxR5pY4k/a-captivating-3d-digital-artwork-featuring-the-nam-Wu-LWg-CUYQpa-EI4wy65-Qq-g-x-Eq-Ut-Wr1-Tqq-YIx0g-W.jpg" alt="Digital Holding Dz">
+    </div>
+    <div>
+      <div class="brand-name">Digital Holding Dz</div>
+      <div class="brand-sub">Interface Vendeur</div>
+    </div>
+  </header>
+
+  <div class="gold-divider"></div>
+
+  <!-- Main Scanner Card -->
+  <div class="scanner-card" id="main-card">
+
+    <!-- Camera Scan Button -->
+    <div class="section-title">Scanner caméra</div>
+    <div class="scan-btn-wrap">
+      <button id="btn-scan" onclick="toggleScanner()" title="Scanner un QR code">
+        <div class="extra-ring"></div>
+        <svg class="scan-icon" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+          <!-- QR code corners -->
+          <rect x="4" y="4" width="15" height="15" rx="2" stroke="url(#goldGrad)" fill="none" stroke-width="2.5"/>
+          <rect x="33" y="4" width="15" height="15" rx="2" stroke="url(#goldGrad)" fill="none" stroke-width="2.5"/>
+          <rect x="4" y="33" width="15" height="15" rx="2" stroke="url(#goldGrad)" fill="none" stroke-width="2.5"/>
+          <rect x="8" y="8" width="7" height="7" rx="1" fill="url(#goldGrad)"/>
+          <rect x="37" y="8" width="7" height="7" rx="1" fill="url(#goldGrad)"/>
+          <rect x="8" y="37" width="7" height="7" rx="1" fill="url(#goldGrad)"/>
+          <!-- dots -->
+          <line x1="33" y1="33" x2="48" y2="33" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="33" y1="39" x2="42" y2="39" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="33" y1="45" x2="48" y2="45" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="45" y1="33" x2="45" y2="48" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="scan-btn-label">Scanner</span>
+      </button>
+    </div>
+
+    <!-- QR Reader -->
+    <div id="qr-reader-container">
+      <div id="qr-reader"></div>
+      <div class="qr-overlay">
+        <div class="qr-corner tl"></div>
+        <div class="qr-corner tr"></div>
+        <div class="qr-corner bl"></div>
+        <div class="qr-corner br"></div>
+        <div class="scan-line"></div>
+      </div>
+    </div>
+    <button id="btn-stop" onclick="stopScanner()">✕ Fermer la caméra</button>
+
+    <!-- USB Scanner (always focused on PC) -->
+    <div class="usb-zone" style="margin-top:1.5rem">
+      <div class="section-title">Scanner USB / portatif</div>
+      <div class="usb-indicator">
+        <div class="usb-dot"></div>
+        <span class="usb-label">En attente de lecture…</span>
+      </div>
+      <input id="usb-input" type="text" placeholder="Le scanner USB écrit ici automatiquement" autocomplete="off" spellcheck="false">
+    </div>
+
+    <!-- Manual Input -->
+    <div class="manual-zone">
+      <div class="section-title">Saisie manuelle</div>
+      <div class="manual-row">
+        <input id="manual-input" type="text" placeholder="ex: C001" autocomplete="off" spellcheck="false"
+          oninput="this.value=this.value.toUpperCase()">
+        <button id="btn-manual" onclick="processManual()">Valider</button>
+      </div>
+    </div>
+
+    <!-- Last Scanned -->
+    <div id="last-scan-zone">
+      <div class="last-label">Dernière carte scannée</div>
+      <div id="last-scan-id">—</div>
+    </div>
+
+  </div>
+
+  <footer>
+    &copy; 2025 <span>Digital Holding Dz</span> · Interface Vendeur
+  </footer>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+const BASE_URL = "https://script.google.com/macros/s/AKfycbyI7GmpUp-0_RhY9BTTXCJ6ijrH8-XZ5tK48X6pIS_xaSBAgU3PbcwkEZlHO-D5QSiY/exec";
+
+// ─── PARTICLES ────────────────────────────────────────────
+(function spawnParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 3 + 1;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      bottom:-10px;
+      animation-duration:${Math.random()*12+8}s;
+      animation-delay:${Math.random()*10}s;
+    `;
+    container.appendChild(p);
+  }
+})();
+
+// ─── BEEP SOUND ───────────────────────────────────────────
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.35);
+  } catch(e) {}
+}
+
+// ─── STATUS FLASH ─────────────────────────────────────────
+function showFlash(msg, isSuccess = true) {
+  const el = document.getElementById('status-flash');
+  document.getElementById('flash-icon').textContent = isSuccess ? '✓' : '✗';
+  document.getElementById('flash-icon').style.color = isSuccess ? '#C9A84C' : '#e53935';
+  document.getElementById('flash-msg').textContent = msg;
+  el.style.borderColor = isSuccess ? 'var(--gold)' : '#e53935';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// ─── PROCESS CARD ID ──────────────────────────────────────
+let lastRedirect = 0;
+function processCardId(rawId) {
+  const now = Date.now();
+  if (now - lastRedirect < 2000) return; // debounce
+  lastRedirect = now;
+
+  const id = rawId.trim().toUpperCase();
+  if (!id) return;
+
+  // Show last scanned
+  const zone = document.getElementById('last-scan-zone');
+  document.getElementById('last-scan-id').textContent = id;
+  zone.classList.add('visible');
+
+  // Card glow
+  const card = document.getElementById('main-card');
+  card.classList.add('success-flash');
+  setTimeout(() => card.classList.remove('success-flash'), 700);
+
+  playBeep();
+  showFlash(`Carte ${id} reconnue — redirection…`);
+
+  // Redirect after short delay
+  setTimeout(() => {
+    const url = 'redirect.html?carte=' + encodeURIComponent(id);
+window.location.href = url;
+  }, 1000);
+}
+
+// ─── CAMERA SCANNER ───────────────────────────────────────
+let html5QrCode = null;
+let scannerRunning = false;
+
+function toggleScanner() {
+  if (scannerRunning) { stopScanner(); return; }
+  startScanner();
+}
+
+function startScanner() {
+  const container = document.getElementById('qr-reader-container');
+  const stopBtn = document.getElementById('btn-stop');
+  const scanBtn = document.getElementById('btn-scan');
+
+  container.classList.add('visible');
+  stopBtn.classList.add('visible');
+  scanBtn.classList.add('active-pulse');
+
+  html5QrCode = new Html5Qrcode("qr-reader");
+  html5QrCode.start(
+    { facingMode: "environment" },
+    { fps: 12, qrbox: { width: 220, height: 220 }, aspectRatio: 1 },
+    (decodedText) => {
+      // Extract carte param if it's a full URL, else use raw
+      let cartId = decodedText;
+      try {
+        const u = new URL(decodedText);
+        cartId = u.searchParams.get('carte') || decodedText;
+      } catch(e) {}
+      stopScanner();
+      processCardId(cartId);
+    },
+    () => {} // error: silent
+  ).catch(err => {
+    showFlash("Impossible d'accéder à la caméra", false);
+    stopScanner();
+  });
+  scannerRunning = true;
+}
+
+function stopScanner() {
+  const container = document.getElementById('qr-reader-container');
+  const stopBtn = document.getElementById('btn-stop');
+  const scanBtn = document.getElementById('btn-scan');
+
+  container.classList.remove('visible');
+  stopBtn.classList.remove('visible');
+  scanBtn.classList.remove('active-pulse');
+
+  if (html5QrCode && scannerRunning) {
+    html5QrCode.stop().catch(() => {});
+    html5QrCode = null;
+  }
+  scannerRunning = false;
+  focusUsb();
+}
+
+// ─── USB / BARCODE SCANNER INPUT ─────────────────────────
+const usbInput = document.getElementById('usb-input');
+
+// Keep USB input focused on desktop
+function focusUsb() {
+  if (window.innerWidth > 768) usbInput.focus();
+}
+
+// Re-focus if user clicks anywhere (but not on interactive elements)
+document.addEventListener('click', (e) => {
+  if (!['INPUT','BUTTON','TEXTAREA'].includes(e.target.tagName)) {
+    focusUsb();
+  }
+});
+
+// USB scanner sends Enter after each scan
+let usbBuffer = '';
+let usbTimer = null;
+usbInput.addEventListener('input', () => {
+  clearTimeout(usbTimer);
+  usbBuffer = usbInput.value;
+  // USB scanners are fast — auto-submit after 150ms of no input
+  usbTimer = setTimeout(() => {
+    if (usbBuffer.trim()) {
+      const id = usbBuffer.trim();
+      usbInput.value = '';
+      usbBuffer = '';
+      processCardId(id);
+    }
+  }, 150);
+});
+
+usbInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    clearTimeout(usbTimer);
+    const id = usbInput.value.trim();
+    usbInput.value = '';
+    usbBuffer = '';
+    if (id) processCardId(id);
+    e.preventDefault();
+  }
+});
+
+// ─── MANUAL INPUT ─────────────────────────────────────────
+function processManual() {
+  const input = document.getElementById('manual-input');
+  const id = input.value.trim().toUpperCase();
+  if (!id) {
+    input.focus();
+    return;
+  }
+  input.value = '';
+  processCardId(id);
+}
+
+document.getElementById('manual-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') processManual();
+});
+
+// ─── INIT ─────────────────────────────────────────────────
+focusUsb();
+// Keep USB field focused when page regains focus
+window.addEventListener('focus', focusUsb);
+</script>
+</body>
+</html>
