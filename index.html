@@ -508,6 +508,28 @@
     </div>
   </header>
 
+<!-- Lien d'ouverture -->
+<div id="open-link-zone" style="display:none; margin-top:1.2rem; text-align:center;">
+  <a id="open-link" href="#" target="_blank" rel="noopener noreferrer"
+    style="
+      display:inline-block;
+      padding:1rem 2rem;
+      background:linear-gradient(135deg,#C9A84C,#FEC715);
+      color:#0a0a0a;
+      font-family:'Montserrat',sans-serif;
+      font-size:0.85rem;
+      font-weight:700;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      text-decoration:none;
+      border-radius:12px;
+      width:100%;
+      box-sizing:border-box;
+    ">
+    ▶ Ouvrir la page client
+  </a>
+</div>
+  
   <div class="gold-divider"></div>
 
   <!-- Main Scanner Card -->
@@ -569,13 +591,35 @@
       </div>
     </div>
 
-    <!-- Last Scanned -->
+   <!-- Last Scanned -->
     <div id="last-scan-zone">
       <div class="last-label">Dernière carte scannée</div>
       <div id="last-scan-id">—</div>
     </div>
 
-  </div>
+    <!-- Lien d'ouverture -->
+    <div id="open-link-zone" style="display:none; margin-top:1.2rem; text-align:center;">
+      <a id="open-link" href="#" target="_blank" rel="noopener noreferrer"
+        style="
+          display:inline-block;
+          padding:1rem 2rem;
+          background:linear-gradient(135deg,#C9A84C,#FEC715);
+          color:#0a0a0a;
+          font-family:'Montserrat',sans-serif;
+          font-size:0.85rem;
+          font-weight:700;
+          letter-spacing:0.12em;
+          text-transform:uppercase;
+          text-decoration:none;
+          border-radius:12px;
+          width:100%;
+          box-sizing:border-box;
+        ">
+        ▶ Ouvrir la page client
+      </a>
+    </div>
+
+  </div>  ← c'est le </div> qui ferme scanner-card
 
   <footer>
     &copy; 2025 <span>Digital Holding Dz</span> · Interface Vendeur
@@ -637,30 +681,34 @@ function showFlash(msg, isSuccess = true) {
 let lastRedirect = 0;
 function processCardId(rawId) {
   const now = Date.now();
-  if (now - lastRedirect < 2000) return; // debounce
+  if (now - lastRedirect < 2000) return;
   lastRedirect = now;
 
   const id = rawId.trim().toUpperCase();
   if (!id) return;
 
-  // Show last scanned
-  const zone = document.getElementById('last-scan-zone');
   document.getElementById('last-scan-id').textContent = id;
-  zone.classList.add('visible');
-
-  // Card glow
-  const card = document.getElementById('main-card');
-  card.classList.add('success-flash');
-  setTimeout(() => card.classList.remove('success-flash'), 700);
+  document.getElementById('last-scan-zone').classList.add('visible');
+  document.getElementById('main-card').classList.add('success-flash');
+  setTimeout(() => document.getElementById('main-card').classList.remove('success-flash'), 700);
 
   playBeep();
-  showFlash(`Carte ${id} reconnue — redirection…`);
+  showFlash('Carte ' + id + ' — ouvrez le lien ci-dessous');
 
-  // Redirect after short delay
-  setTimeout(() => {
-    const url = `${BASE_URL}?carte=${encodeURIComponent(id)}&mode=vendeur`;
-    window.location.href = url;
-  }, 1000);
+  // Construire l'URL via redirect.html
+  const url = 'redirect.html?carte=' + encodeURIComponent(id);
+
+  // Créer un lien visible et cliquable — fonctionne sur mobile et PC
+  const linkZone = document.getElementById('open-link-zone');
+  const link = document.getElementById('open-link');
+  link.href = url;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  linkZone.style.display = 'block';
+  link.textContent = '▶ Ouvrir la page de ' + id;
+
+  // Sur PC : clic automatique (pas bloqué car déclenché dans le même call stack qu'un event)
+  link.click();
 }
 
 // ─── CAMERA SCANNER ───────────────────────────────────────
