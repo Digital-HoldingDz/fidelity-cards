@@ -686,9 +686,7 @@ function processCardId(rawId) {
   link.textContent = '▶ Ouvrir la page de ' + id;
 
   // Sur PC : clic automatique (pas bloqué car déclenché dans le même call stack qu'un event)
-  if (window.innerWidth > 768) {
-    link.click();
-  }
+  link.click();
 }
 
 // ─── CAMERA SCANNER ───────────────────────────────────────
