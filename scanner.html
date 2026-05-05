@@ -34,7 +34,6 @@
     position: relative;
   }
 
-  /* ─── BACKGROUND ATMOSPHERE ─── */
   body::before {
     content: '';
     position: fixed;
@@ -47,7 +46,6 @@
     z-index: 0;
   }
 
-  /* ─── PARTICLES ─── */
   #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
   .particle {
     position: absolute;
@@ -63,7 +61,6 @@
     100% { transform: translateY(-100vh) scale(0.3); opacity: 0; }
   }
 
-  /* ─── LAYOUT ─── */
   .page-wrapper {
     position: relative;
     z-index: 1;
@@ -74,7 +71,6 @@
     padding: 2rem 1.25rem 3rem;
   }
 
-  /* ─── HEADER ─── */
   header {
     display: flex;
     flex-direction: column;
@@ -124,7 +120,6 @@
     font-weight: 500;
   }
 
-  /* ─── DIVIDER ─── */
   .gold-divider {
     width: 120px; height: 1px;
     background: linear-gradient(90deg, transparent, var(--gold), transparent);
@@ -132,7 +127,6 @@
     opacity: 0.6;
   }
 
-  /* ─── MAIN CARD ─── */
   .scanner-card {
     width: 100%;
     max-width: 500px;
@@ -152,7 +146,6 @@
     opacity: 0.5;
   }
 
-  /* ─── SCAN BUTTON ─── */
   .scan-btn-wrap {
     display: flex;
     justify-content: center;
@@ -221,7 +214,6 @@
     font-weight: 600;
   }
 
-  /* ─── QR READER CONTAINER ─── */
   #qr-reader-container {
     display: none;
     margin-bottom: 1.5rem;
@@ -231,13 +223,7 @@
     position: relative;
   }
   #qr-reader-container.visible { display: block; }
-
-  #qr-reader {
-    width: 100% !important;
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  /* Override html5-qrcode default ugly styles */
+  #qr-reader { width: 100% !important; border-radius: 12px; overflow: hidden; }
   #qr-reader video { border-radius: 12px; }
   #qr-reader > div:first-child { display: none !important; }
   #qr-reader__scan_region { background: transparent !important; }
@@ -297,7 +283,6 @@
   #btn-stop.visible { display: block; }
   #btn-stop:hover { border-color: var(--gold); color: var(--gold); }
 
-  /* ─── SECTION TITLE ─── */
   .section-title {
     font-size: 0.62rem;
     letter-spacing: 0.22em;
@@ -308,7 +293,6 @@
     font-weight: 600;
   }
 
-  /* ─── USB INPUT (PC) ─── */
   .usb-zone {
     margin-bottom: 1.5rem;
     padding: 1rem 1.25rem;
@@ -349,13 +333,8 @@
   #usb-input:focus { border-bottom-color: var(--gold); }
   #usb-input::placeholder { color: var(--text-muted); font-size: 0.8rem; }
 
-  /* ─── MANUAL INPUT ─── */
   .manual-zone { margin-bottom: 1.5rem; }
-
-  .manual-row {
-    display: flex;
-    gap: 0.6rem;
-  }
+  .manual-row { display: flex; gap: 0.6rem; }
 
   #manual-input {
     flex: 1;
@@ -392,58 +371,89 @@
   #btn-manual:hover { opacity: 0.88; }
   #btn-manual:active { transform: scale(0.97); }
 
-  /* ─── LAST SCANNED ─── */
-  #last-scan-zone {
+  /* ─── ZONE RÉSULTAT SCAN (remplace last-scan-zone + open-link-zone) ─── */
+  #scan-result-zone {
     display: none;
     margin-top: 1.5rem;
-    padding: 1rem 1.25rem;
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 12px;
-    background: rgba(201,168,76,0.04);
-    animation: slide-up 0.4s ease;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.05);
+    animation: slide-up 0.35s ease;
   }
   @keyframes slide-up {
     from { transform: translateY(10px); opacity: 0; }
     to   { transform: translateY(0); opacity: 1; }
   }
-  #last-scan-zone.visible { display: block; }
+  #scan-result-zone.visible { display: block; }
 
-  .last-label { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.4rem; }
-  #last-scan-id {
+  .result-header {
+    padding: 0.75rem 1.25rem 0.6rem;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .result-card-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  #result-card-id {
     font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     background: linear-gradient(90deg, var(--gold), var(--gold-light));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     font-weight: 600;
   }
+  /* Bouton Nouvelle carte */
+  #btn-nouvelle-carte {
+    padding: 0.4rem 0.9rem;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 8px;
+    color: var(--gold);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  #btn-nouvelle-carte:hover {
+    background: rgba(201,168,76,0.1);
+    border-color: var(--gold);
+  }
 
-  /* ─── STATUS FLASH ─── */
-  #status-flash {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    background: var(--black-card);
-    border: 1px solid var(--gold);
-    border-radius: 16px;
-    padding: 1.5rem 2.5rem;
+  /* Bouton Ouvrir — dans la zone résultat */
+  #btn-ouvrir {
+    display: block;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-mid) 100%);
+    color: var(--black);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
     text-align: center;
-    z-index: 999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s, transform 0.2s;
-    box-shadow: 0 0 60px rgba(201,168,76,0.3);
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
   }
-  #status-flash.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  #status-flash .flash-icon { font-size: 2rem; margin-bottom: 0.4rem; }
-  #status-flash .flash-msg { font-size: 0.85rem; color: var(--gold-light); letter-spacing: 0.08em; }
+  #btn-ouvrir:hover { opacity: 0.88; }
 
-  /* ─── FOOTER ─── */
+  @keyframes success-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(76,175,80,0); }
+    50% { box-shadow: 0 0 40px rgba(76,175,80,0.5); }
+  }
+  .scanner-card.success-flash { animation: success-glow 0.6s ease; }
+
   footer {
     margin-top: 2.5rem;
     text-align: center;
@@ -459,14 +469,6 @@
     background-clip: text;
   }
 
-  /* ─── SUCCESS GLOW ─── */
-  @keyframes success-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(76,175,80,0); }
-    50% { box-shadow: 0 0 40px rgba(76,175,80,0.5); }
-  }
-  .scanner-card.success-flash { animation: success-glow 0.6s ease; }
-
-  /* ─── MOBILE TWEAKS ─── */
   @media (max-width: 480px) {
     #btn-scan { width: 140px; height: 140px; }
     .scan-icon { width: 44px; height: 44px; }
@@ -476,7 +478,6 @@
 </head>
 <body>
 
-<!-- SVG defs for gradient stroke -->
 <svg width="0" height="0" style="position:absolute">
   <defs>
     <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -487,17 +488,9 @@
   </defs>
 </svg>
 
-<!-- Particles -->
 <div id="particles"></div>
 
-<!-- Status Flash -->
-<div id="status-flash">
-  <div class="flash-icon" id="flash-icon">✓</div>
-  <div class="flash-msg" id="flash-msg">Carte reconnue</div>
-</div>
-
 <div class="page-wrapper">
-  <!-- Header -->
   <header>
     <div class="logo-ring">
       <img src="https://i.ibb.co/KxR5pY4k/a-captivating-3d-digital-artwork-featuring-the-nam-Wu-LWg-CUYQpa-EI4wy65-Qq-g-x-Eq-Ut-Wr1-Tqq-YIx0g-W.jpg" alt="Digital Holding Dz">
@@ -508,47 +501,22 @@
     </div>
   </header>
 
-<!-- Lien d'ouverture -->
-<div id="open-link-zone" style="display:none; margin-top:1.2rem; text-align:center;">
-  <a id="open-link" href="#" target="_blank" rel="noopener noreferrer"
-    style="
-      display:inline-block;
-      padding:1rem 2rem;
-      background:linear-gradient(135deg,#C9A84C,#FEC715);
-      color:#0a0a0a;
-      font-family:'Montserrat',sans-serif;
-      font-size:0.85rem;
-      font-weight:700;
-      letter-spacing:0.12em;
-      text-transform:uppercase;
-      text-decoration:none;
-      border-radius:12px;
-      width:100%;
-      box-sizing:border-box;
-    ">
-    ▶ Ouvrir la page client
-  </a>
-</div>
-  
   <div class="gold-divider"></div>
 
-  <!-- Main Scanner Card -->
   <div class="scanner-card" id="main-card">
 
-    <!-- Camera Scan Button -->
+    <!-- Caméra -->
     <div class="section-title">Scanner caméra</div>
     <div class="scan-btn-wrap">
       <button id="btn-scan" onclick="toggleScanner()" title="Scanner un QR code">
         <div class="extra-ring"></div>
         <svg class="scan-icon" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
-          <!-- QR code corners -->
           <rect x="4" y="4" width="15" height="15" rx="2" stroke="url(#goldGrad)" fill="none" stroke-width="2.5"/>
           <rect x="33" y="4" width="15" height="15" rx="2" stroke="url(#goldGrad)" fill="none" stroke-width="2.5"/>
           <rect x="4" y="33" width="15" height="15" rx="2" stroke="url(#goldGrad)" fill="none" stroke-width="2.5"/>
           <rect x="8" y="8" width="7" height="7" rx="1" fill="url(#goldGrad)"/>
           <rect x="37" y="8" width="7" height="7" rx="1" fill="url(#goldGrad)"/>
           <rect x="8" y="37" width="7" height="7" rx="1" fill="url(#goldGrad)"/>
-          <!-- dots -->
           <line x1="33" y1="33" x2="48" y2="33" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
           <line x1="33" y1="39" x2="42" y2="39" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
           <line x1="33" y1="45" x2="48" y2="45" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
@@ -558,7 +526,6 @@
       </button>
     </div>
 
-    <!-- QR Reader -->
     <div id="qr-reader-container">
       <div id="qr-reader"></div>
       <div class="qr-overlay">
@@ -571,7 +538,7 @@
     </div>
     <button id="btn-stop" onclick="stopScanner()">✕ Fermer la caméra</button>
 
-    <!-- USB Scanner (always focused on PC) -->
+    <!-- Scanner USB -->
     <div class="usb-zone" style="margin-top:1.5rem">
       <div class="section-title">Scanner USB / portatif</div>
       <div class="usb-indicator">
@@ -581,7 +548,7 @@
       <input id="usb-input" type="text" placeholder="Le scanner USB écrit ici automatiquement" autocomplete="off" spellcheck="false">
     </div>
 
-    <!-- Manual Input -->
+    <!-- Saisie manuelle -->
     <div class="manual-zone">
       <div class="section-title">Saisie manuelle</div>
       <div class="manual-row">
@@ -591,35 +558,19 @@
       </div>
     </div>
 
-   <!-- Last Scanned -->
-    <div id="last-scan-zone">
-      <div class="last-label">Dernière carte scannée</div>
-      <div id="last-scan-id">—</div>
+    <!-- Zone résultat (remplace les 2 zones précédentes) -->
+    <div id="scan-result-zone">
+      <div class="result-header">
+        <div>
+          <div class="result-card-label">Carte scannée</div>
+          <div id="result-card-id">—</div>
+        </div>
+        <button id="btn-nouvelle-carte" onclick="resetScan()">↺ Nouvelle carte</button>
+      </div>
+      <a id="btn-ouvrir" href="#" target="_blank" rel="noopener noreferrer">▶ Ouvrir la page client</a>
     </div>
 
-    <!-- Lien d'ouverture -->
-    <div id="open-link-zone" style="display:none; margin-top:1.2rem; text-align:center;">
-      <a id="open-link" href="#" target="_blank" rel="noopener noreferrer"
-        style="
-          display:inline-block;
-          padding:1rem 2rem;
-          background:linear-gradient(135deg,#C9A84C,#FEC715);
-          color:#0a0a0a;
-          font-family:'Montserrat',sans-serif;
-          font-size:0.85rem;
-          font-weight:700;
-          letter-spacing:0.12em;
-          text-transform:uppercase;
-          text-decoration:none;
-          border-radius:12px;
-          width:100%;
-          box-sizing:border-box;
-        ">
-        ▶ Ouvrir la page client
-      </a>
-    </div>
-
-  </div>  ← c'est le </div> qui ferme scanner-card
+  </div>
 
   <footer>
     &copy; 2025 <span>Digital Holding Dz</span> · Interface Vendeur
@@ -627,58 +578,50 @@
 </div>
 
 <script>
-// ─── CONFIG ───────────────────────────────────────────────
 const BASE_URL = "https://script.google.com/macros/s/AKfycbyI7GmpUp-0_RhY9BTTXCJ6ijrH8-XZ5tK48X6pIS_xaSBAgU3PbcwkEZlHO-D5QSiY/exec";
 
 // ─── PARTICLES ────────────────────────────────────────────
-(function spawnParticles() {
+(function() {
   const container = document.getElementById('particles');
   for (let i = 0; i < 18; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
     const size = Math.random() * 3 + 1;
-    p.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}%;
-      bottom:-10px;
-      animation-duration:${Math.random()*12+8}s;
-      animation-delay:${Math.random()*10}s;
-    `;
+    p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;bottom:-10px;animation-duration:${Math.random()*12+8}s;animation-delay:${Math.random()*10}s;`;
     container.appendChild(p);
   }
 })();
 
-// ─── BEEP SOUND ───────────────────────────────────────────
+// ─── BEEP ─────────────────────────────────────────────────
 function playBeep() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+    osc.connect(gain); gain.connect(ctx.destination);
     osc.type = 'sine';
     osc.frequency.setValueAtTime(880, ctx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.1);
     gain.gain.setValueAtTime(0.3, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.35);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.35);
   } catch(e) {}
 }
 
-// ─── STATUS FLASH ─────────────────────────────────────────
-function showFlash(msg, isSuccess = true) {
-  const el = document.getElementById('status-flash');
-  document.getElementById('flash-icon').textContent = isSuccess ? '✓' : '✗';
-  document.getElementById('flash-icon').style.color = isSuccess ? '#C9A84C' : '#e53935';
-  document.getElementById('flash-msg').textContent = msg;
-  el.style.borderColor = isSuccess ? 'var(--gold)' : '#e53935';
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 1800);
+// ─── RESET — prêt pour une nouvelle carte ────────────────
+function resetScan() {
+  document.getElementById('scan-result-zone').classList.remove('visible');
+  document.getElementById('scan-result-zone').style.display = 'none';
+  document.getElementById('result-card-id').textContent = '—';
+  document.getElementById('btn-ouvrir').href = '#';
+  document.getElementById('manual-input').value = '';
+  lastRedirect = 0;
+  focusUsb();
 }
 
-// ─── PROCESS CARD ID ──────────────────────────────────────
+// ─── PROCESS CARD ─────────────────────────────────────────
 let lastRedirect = 0;
+
 function processCardId(rawId) {
   const now = Date.now();
   if (now - lastRedirect < 2000) return;
@@ -687,31 +630,28 @@ function processCardId(rawId) {
   const id = rawId.trim().toUpperCase();
   if (!id) return;
 
-  document.getElementById('last-scan-id').textContent = id;
-  document.getElementById('last-scan-zone').classList.add('visible');
+  // Animation carte
   document.getElementById('main-card').classList.add('success-flash');
   setTimeout(() => document.getElementById('main-card').classList.remove('success-flash'), 700);
 
   playBeep();
-  showFlash('Carte ' + id + ' — ouvrez le lien ci-dessous');
 
-  // Construire l'URL via redirect.html
-  const url = 'redirect.html?carte=' + encodeURIComponent(id);
+  // Construire l'URL
+  const url = BASE_URL + '?carte=' + encodeURIComponent(id) + '&mode=vendeur';
 
-  // Créer un lien visible et cliquable — fonctionne sur mobile et PC
-  const linkZone = document.getElementById('open-link-zone');
-  const link = document.getElementById('open-link');
-  link.href = url;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  linkZone.style.display = 'block';
-  link.textContent = '▶ Ouvrir la page de ' + id;
+  // Afficher la zone résultat
+  const zone = document.getElementById('scan-result-zone');
+  document.getElementById('result-card-id').textContent = id;
+  const btnOuvrir = document.getElementById('btn-ouvrir');
+  btnOuvrir.href = url;
+  zone.style.display = 'block';
+  zone.classList.add('visible');
 
-  // Sur PC : clic automatique (pas bloqué car déclenché dans le même call stack qu'un event)
-  link.click();
+  // Ouvrir automatiquement dans un nouvel onglet
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
-// ─── CAMERA SCANNER ───────────────────────────────────────
+// ─── CAMÉRA ───────────────────────────────────────────────
 let html5QrCode = null;
 let scannerRunning = false;
 
@@ -724,7 +664,6 @@ function startScanner() {
   const container = document.getElementById('qr-reader-container');
   const stopBtn = document.getElementById('btn-stop');
   const scanBtn = document.getElementById('btn-scan');
-
   container.classList.add('visible');
   stopBtn.classList.add('visible');
   scanBtn.classList.add('active-pulse');
@@ -734,32 +673,25 @@ function startScanner() {
     { facingMode: "environment" },
     { fps: 12, qrbox: { width: 220, height: 220 }, aspectRatio: 1 },
     (decodedText) => {
-      // Extract carte param if it's a full URL, else use raw
-      let cartId = decodedText;
+      let cardId = decodedText;
       try {
         const u = new URL(decodedText);
-        cartId = u.searchParams.get('carte') || decodedText;
+        cardId = u.searchParams.get('carte') || decodedText;
       } catch(e) {}
       stopScanner();
-      processCardId(cartId);
+      processCardId(cardId);
     },
-    () => {} // error: silent
-  ).catch(err => {
-    showFlash("Impossible d'accéder à la caméra", false);
+    () => {}
+  ).catch(() => {
     stopScanner();
   });
   scannerRunning = true;
 }
 
 function stopScanner() {
-  const container = document.getElementById('qr-reader-container');
-  const stopBtn = document.getElementById('btn-stop');
-  const scanBtn = document.getElementById('btn-scan');
-
-  container.classList.remove('visible');
-  stopBtn.classList.remove('visible');
-  scanBtn.classList.remove('active-pulse');
-
+  document.getElementById('qr-reader-container').classList.remove('visible');
+  document.getElementById('btn-stop').classList.remove('visible');
+  document.getElementById('btn-scan').classList.remove('active-pulse');
   if (html5QrCode && scannerRunning) {
     html5QrCode.stop().catch(() => {});
     html5QrCode = null;
@@ -768,33 +700,26 @@ function stopScanner() {
   focusUsb();
 }
 
-// ─── USB / BARCODE SCANNER INPUT ─────────────────────────
+// ─── USB ──────────────────────────────────────────────────
 const usbInput = document.getElementById('usb-input');
 
-// Keep USB input focused on desktop
 function focusUsb() {
   if (window.innerWidth > 768) usbInput.focus();
 }
 
-// Re-focus if user clicks anywhere (but not on interactive elements)
 document.addEventListener('click', (e) => {
-  if (!['INPUT','BUTTON','TEXTAREA'].includes(e.target.tagName)) {
-    focusUsb();
-  }
+  if (!['INPUT','BUTTON','TEXTAREA','A'].includes(e.target.tagName)) focusUsb();
 });
 
-// USB scanner sends Enter after each scan
 let usbBuffer = '';
 let usbTimer = null;
 usbInput.addEventListener('input', () => {
   clearTimeout(usbTimer);
   usbBuffer = usbInput.value;
-  // USB scanners are fast — auto-submit after 150ms of no input
   usbTimer = setTimeout(() => {
     if (usbBuffer.trim()) {
       const id = usbBuffer.trim();
-      usbInput.value = '';
-      usbBuffer = '';
+      usbInput.value = ''; usbBuffer = '';
       processCardId(id);
     }
   }, 150);
@@ -804,21 +729,17 @@ usbInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     clearTimeout(usbTimer);
     const id = usbInput.value.trim();
-    usbInput.value = '';
-    usbBuffer = '';
+    usbInput.value = ''; usbBuffer = '';
     if (id) processCardId(id);
     e.preventDefault();
   }
 });
 
-// ─── MANUAL INPUT ─────────────────────────────────────────
+// ─── SAISIE MANUELLE ──────────────────────────────────────
 function processManual() {
   const input = document.getElementById('manual-input');
   const id = input.value.trim().toUpperCase();
-  if (!id) {
-    input.focus();
-    return;
-  }
+  if (!id) { input.focus(); return; }
   input.value = '';
   processCardId(id);
 }
@@ -829,7 +750,6 @@ document.getElementById('manual-input').addEventListener('keydown', (e) => {
 
 // ─── INIT ─────────────────────────────────────────────────
 focusUsb();
-// Keep USB field focused when page regains focus
 window.addEventListener('focus', focusUsb);
 </script>
 </body>
