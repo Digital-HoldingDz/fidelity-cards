@@ -26,7 +26,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: #1310BD;
+    background: linear-gradient(135deg, #1310BD 0%, #0a0880 40%, #1a1aee 70%, #3535cc 100%);
     color: #e8e0cc;
     font-family: 'Montserrat', sans-serif;
     min-height: 100vh;
@@ -34,16 +34,24 @@
     position: relative;
   }
 
-  body::before {
+body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background:
-      radial-gradient(ellipse 60% 50% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 30% at 80% 80%, rgba(254,199,21,0.04) 0%, transparent 60%),
-      radial-gradient(ellipse 30% 20% at 10% 60%, rgba(201,168,76,0.03) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
+  }
+
+  /* Formes géométriques low-poly 3D */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 50%),
+      linear-gradient(225deg, rgba(180,180,255,0.15) 0%, transparent 40%);
   }
 
   #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
@@ -477,6 +485,44 @@
 </style>
 </head>
 <body>
+
+<!-- Low-poly background -->
+<svg style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;" preserveAspectRatio="xMidYMid slice" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="p1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.18"/>
+      <stop offset="100%" style="stop-color:#8888ff;stop-opacity:0.08"/>
+    </linearGradient>
+    <linearGradient id="p2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#aaaaee;stop-opacity:0.22"/>
+      <stop offset="100%" style="stop-color:#1310BD;stop-opacity:0.05"/>
+    </linearGradient>
+    <linearGradient id="p3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.12"/>
+      <stop offset="100%" style="stop-color:#5555cc;stop-opacity:0.06"/>
+    </linearGradient>
+    <linearGradient id="p4" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" style="stop-color:#ccccff;stop-opacity:0.20"/>
+      <stop offset="100%" style="stop-color:#0000aa;stop-opacity:0.04"/>
+    </linearGradient>
+    <linearGradient id="p5" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.10"/>
+      <stop offset="100%" style="stop-color:#9999ff;stop-opacity:0.14"/>
+    </linearGradient>
+  </defs>
+  <!-- Grandes facettes -->
+  <polygon points="0,0 350,0 180,280" fill="url(#p1)"/>
+  <polygon points="350,0 800,0 800,220 500,320" fill="url(#p2)"/>
+  <polygon points="0,0 180,280 0,420" fill="url(#p3)"/>
+  <polygon points="180,280 500,320 350,600 0,420" fill="url(#p4)"/>
+  <polygon points="500,320 800,220 800,600 350,600" fill="url(#p5)"/>
+  <polygon points="350,0 500,320 180,280" fill="url(#p1)" opacity="0.5"/>
+  <polygon points="800,220 800,600 500,320" fill="url(#p2)" opacity="0.4"/>
+  <polygon points="0,420 350,600 0,600" fill="url(#p3)" opacity="0.6"/>
+  <!-- Reflets -->
+  <polygon points="0,0 800,0 500,320 180,280" fill="url(#p4)" opacity="0.08"/>
+  <polygon points="350,0 800,220 500,320" fill="url(#p5)" opacity="0.15"/>
+</svg>  
 
 <svg width="0" height="0" style="position:absolute">
   <defs>
